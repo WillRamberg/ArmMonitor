@@ -16,9 +16,14 @@ class SensorService(private val context: Context) : SensorEventListener {
     private var gyroscope: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
 
     private var isRecording = false
-    private var sensorDataListener: ((Long, Float) -> Unit)? = null
+    private var sensorDataListener: ((Long, Float, Float, Float, Long) -> Unit)? = null
 
-    fun startMeasurement(listener: (Long, Float) -> Unit) {
+    private val sensorProcessingService = SensorProcessingService()
+
+    private var lastTimestamp = System.currentTimeMillis()
+    private var lastGyroAngle = 0.0
+
+    fun startMeasurement(listener: (Long, Float, Float, Float, Long) -> Unit) {
         if (!isRecording) {
             isRecording = true
             sensorDataListener = listener
@@ -38,19 +43,42 @@ class SensorService(private val context: Context) : SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         if (isRecording && event != null) {
             val timestamp = System.currentTimeMillis()
-            val elevationAngle = computeElevationAngle(event)
-            sensorDataListener?.invoke(timestamp, elevationAngle)
+
+            // Define a time difference (dt)
+            val dt = timestamp - lastTimestamp
+
+            // Capture sensor data (for example, using accelerometer)
+            when (event.sensor.type) {
+                Sensor.TYPE_ACCELEROMETER -> {
+                    val elevationAngle = computeElevationAngle(event)
+                    val gyroAngle = lastGyroAngle.toFloat()  // Use gyroscope data here if needed
+                    val filteredAngle = sensorProcessingService.applyEWMAFilter(elevationAngle.toDouble()) // Apply EWMA filter
+
+                    // Apply complementary filter after both sensor data is available
+                    val fusedAngle = sensorProcessingService.applyComplementaryFilter(
+                        filteredAngle, gyroAngle.toDouble(), dt
+                    )
+
+                    // Pass all the required parameters to the listener
+                    sensorDataListener?.invoke(timestamp, elevationAngle.toFloat(), gyroAngle, filteredAngle.toFloat(), dt)
+
+                }
+                Sensor.TYPE_GYROSCOPE -> {
+                    // Process gyroscope data if needed
+                    lastGyroAngle = event.values[0].toDouble()
+                }
+            }
+
+            lastTimestamp = timestamp
         }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
-    private fun computeElevationAngle(event: SensorEvent): Float {
-        if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
-            val z = event.values[2]
-            val y = event.values[1]
-            return Math.toDegrees(atan2(y.toDouble(), z.toDouble())).toFloat()
-        }
-        return 0f
+    private fun computeElevationAngle(event: SensorEvent): Double {
+        val z = event.values[2]
+        val y = event.values[1]
+        return Math.toDegrees(atan2(y.toDouble(), z.toDouble()))
     }
 }
+

@@ -31,11 +31,28 @@ class MainActivity : AppCompatActivity() {
 
         binding.exportButton.setOnClickListener {
             val path = sensorViewModel.exportDataToCsv(application, "arm_elevation_data")
-            binding.dataTextView.text = "Data exported to: $path"
+            binding.dataTextView.text = "Data exported to: $path"  // This should work now
         }
 
-        sensorViewModel.sensorDataList.observe(this, Observer { dataList ->
-            binding.dataTextView.text = dataList.joinToString("\n") { "Time: ${it.timestamp}, Angle: ${it.elevationAngle}°" }
+        sensorViewModel.ewmaDataList.observe(this, Observer { ewmaData ->
+            // Display the filtered (EWMA) data
+            binding.ewmaTextView.text = ewmaData.joinToString("\n") {
+                "Time: ${it.timestamp}, Filtered Angle: ${it.filteredAngle}°"
+            }
+        })
+
+        sensorViewModel.complDataList.observe(this, Observer { complData ->
+            // Display the fused (complementary) data
+            binding.complTextView.text = complData.joinToString("\n") {
+                "Time: ${it.timestamp}, Fused Angle: ${it.fusedAngle}°"
+            }
+        })
+
+        sensorViewModel.sensorDataList.observe(this, Observer { allData ->
+            // Display combined data (elevation, filtered, and fused angles)
+            binding.dataTextView.text = allData.joinToString("\n") {
+                "Time: ${it.timestamp}, Elevation Angle: ${it.elevationAngle}°, Filtered: ${it.filteredAngle}°, Fused: ${it.fusedAngle}°"
+            }
         })
     }
 }

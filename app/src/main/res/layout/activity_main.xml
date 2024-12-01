@@ -5,12 +5,14 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- Button to start measurement -->
     <Button
         android:id="@+id/startButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Start" />
 
+    <!-- Button to stop measurement -->
     <Button
         android:id="@+id/stopButton"
         android:layout_width="wrap_content"
@@ -18,15 +20,39 @@
         android:text="Stop"
         android:visibility="gone" />
 
+    <!-- Button to export data to CSV -->
     <Button
         android:id="@+id/exportButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Export" />
 
+    <!-- TextView to show the combined data -->
     <TextView
         android:id="@+id/dataTextView"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Data will be displayed here" />
+        android:text="Combined Data: Angle, Filtered, Fused"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp" />
+
+    <!-- TextView to show the filtered (EWMA) angle -->
+    <TextView
+        android:id="@+id/ewmaTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Filtered (EWMA) Angle: "
+        android:textSize="16sp"
+        android:layout_marginTop="16dp" />
+
+    <!-- TextView to show the fused (complementary) angle -->
+    <TextView
+        android:id="@+id/complTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fused (Complementary) Angle: "
+        android:textSize="16sp"
+        android:layout_marginTop="16dp" />
+
 </LinearLayout>
+
