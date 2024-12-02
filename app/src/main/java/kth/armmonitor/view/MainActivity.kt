@@ -1,43 +1,20 @@
 package kth.armmonitor.view
 
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import kth.armmonitor.databinding.ActivityMainBinding
-import kth.armmonitor.viewmodel.SensorViewModel
+import kth.armmonitor.R
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
-    private val sensorViewModel: SensorViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
-        val graphView = binding.graphView
-
-        binding.startButton.setOnClickListener {
-            sensorViewModel.startMeasurement()
-            binding.startButton.visibility = android.view.View.GONE
-            binding.stopButton.visibility = android.view.View.VISIBLE
+        // Set an empty content view or simply skip setting it since we are using fragments
+        if (savedInstanceState == null) {
+            // Adding the MonitorFragment to the activity
+            supportFragmentManager.beginTransaction()
+                .replace(android.R.id.content, Screen())  // Use default root view ID
+                .commit()
         }
-
-        binding.stopButton.setOnClickListener {
-            sensorViewModel.stopMeasurement()
-            binding.startButton.visibility = android.view.View.VISIBLE
-            binding.stopButton.visibility = android.view.View.GONE
-        }
-
-        binding.exportButton.setOnClickListener {
-            val path = sensorViewModel.exportDataToCsv(application, "arm_elevation_data")
-            binding.dataTextView.text = "Data exported to: $path"
-        }
-
-        sensorViewModel.sensorDataList.observe(this, Observer { dataList ->
-            graphView.updateData(dataList)
-        })
     }
 }
