@@ -64,7 +64,7 @@ class SensorService(private val context: Context) : SensorEventListener {
     }
 
     fun applyFusion(accelAngle: Float, gyroAngle: Float): Float {
-        val alphaFusion = 0.3f // Adjust for drift response
+        val alphaFusion = 0.02f // Adjust for drift response
         return alphaFusion * gyroAngle + (1 - alphaFusion) * accelAngle
     }
 }
