@@ -18,8 +18,9 @@ class SensorViewModel(application: Application) : AndroidViewModel(application) 
     private val dataBuffer = mutableListOf<SensorData>()
 
     fun startMeasurement() {
-        sensorService.startMeasurement { timestamp, angle ->
-            val data = SensorData(timestamp, angle)
+        sensorService.startMeasurement { timestamp, ewmaAngle, gyroAngle ->
+            val fusionAngle = sensorService.applyFusion(ewmaAngle, gyroAngle)
+            val data = SensorData(timestamp, ewmaAngle, fusionAngle)
             dataBuffer.add(data)
             _sensorDataList.postValue(dataBuffer)
         }
@@ -30,7 +31,7 @@ class SensorViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun exportDataToCsv(context: Application, fileName: String): String {
-        val csvData = dataBuffer.map { "${it.timestamp},${it.elevationAngle}" }
+        val csvData = dataBuffer.map { "${it.timestamp},${it.ewmaAngle},${it.fusionAngle}" }
         val file = csvService.exportToCsv(context, csvData, fileName)
         return file.absolutePath
     }

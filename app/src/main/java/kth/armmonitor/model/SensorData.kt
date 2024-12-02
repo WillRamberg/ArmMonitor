@@ -2,5 +2,6 @@ package kth.armmonitor.model
 
 data class SensorData(
     val timestamp: Long,
-    val elevationAngle: Float
+    val ewmaAngle: Float,
+    val fusionAngle: Float
 )
