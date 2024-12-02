@@ -18,7 +18,7 @@ class SensorService(private val context: Context) : SensorEventListener {
     private var sensorDataListener: ((Long, Float, Float) -> Unit)? = null
 
     private var ewmaAngle = 0f
-    private var alphaEWMA = 0.1f // Adjust as needed
+    private val alphaEWMA = 0.1f
 
     fun startMeasurement(listener: (Long, Float, Float) -> Unit) {
         if (!isRecording) {
@@ -45,7 +45,7 @@ class SensorService(private val context: Context) : SensorEventListener {
             // EWMA Filter Calculation
             ewmaAngle = alphaEWMA * newAngle + (1 - alphaEWMA) * ewmaAngle
 
-            // Example gyro data (adjust source as needed)
+            // Gyro data
             val gyroAngle = if (event.sensor.type == Sensor.TYPE_GYROSCOPE) event.values[0] else 0f
 
             sensorDataListener?.invoke(timestamp, ewmaAngle, gyroAngle)
@@ -64,8 +64,7 @@ class SensorService(private val context: Context) : SensorEventListener {
     }
 
     fun applyFusion(accelAngle: Float, gyroAngle: Float): Float {
-        val alphaFusion = 0.02f // Adjust for drift response
+        val alphaFusion = 0.02f
         return alphaFusion * gyroAngle + (1 - alphaFusion) * accelAngle
     }
 }
-

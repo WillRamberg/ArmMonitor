@@ -8,11 +8,16 @@ import java.io.FileWriter
 class CsvService {
 
     fun exportToCsv(context: Context, data: List<String>, fileName: String): File {
-        val csvFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "$fileName.csv")
+        // Bestäm platsen som Downloads-mappen
+        val csvFile = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "$fileName.csv")
+
+        // Skapa och skriv till CSV-filen
         val writer = FileWriter(csvFile)
-        data.forEach { writer.write(it + "\n") }
+        writer.write("Timestamp,EWMA Angle,Fusion Angle\n") // Lägg till kolumnrubriker
+        data.forEach { writer.write(it + "\n") } // Lägg till data
         writer.flush()
         writer.close()
-        return csvFile
+
+        return csvFile // Returnera filens referens
     }
 }
