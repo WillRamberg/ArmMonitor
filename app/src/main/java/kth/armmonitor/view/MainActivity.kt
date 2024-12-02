@@ -17,6 +17,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val graphView = binding.graphView
+
         binding.startButton.setOnClickListener {
             sensorViewModel.startMeasurement()
             binding.startButton.visibility = android.view.View.GONE
@@ -35,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         sensorViewModel.sensorDataList.observe(this, Observer { dataList ->
-            binding.dataTextView.text = dataList.joinToString("\n") { "Time: ${it.timestamp}, Angle: ${it.elevationAngle}°" }
+            graphView.updateData(dataList)
         })
     }
 }

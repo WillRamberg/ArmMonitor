@@ -13,8 +13,6 @@ class SensorService(private val context: Context) : SensorEventListener {
         context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
     private var accelerometer: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-    private var gyroscope: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
-
     private var isRecording = false
     private var sensorDataListener: ((Long, Float) -> Unit)? = null
 
@@ -23,7 +21,6 @@ class SensorService(private val context: Context) : SensorEventListener {
             isRecording = true
             sensorDataListener = listener
             accelerometer?.also { sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI) }
-            gyroscope?.also { sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI) }
         }
     }
 
@@ -46,11 +43,8 @@ class SensorService(private val context: Context) : SensorEventListener {
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
     private fun computeElevationAngle(event: SensorEvent): Float {
-        if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
-            val z = event.values[2]
-            val y = event.values[1]
-            return Math.toDegrees(atan2(y.toDouble(), z.toDouble())).toFloat()
-        }
-        return 0f
+        val z = event.values[2]
+        val y = event.values[1]
+        return Math.toDegrees(atan2(y.toDouble(), z.toDouble())).toFloat()
     }
 }
